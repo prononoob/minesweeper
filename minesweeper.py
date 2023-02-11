@@ -6,11 +6,13 @@ class Data:
 		self.height, self.width, self.bombs = height, width, bombs
 		self.board = []
 
+		# Generate a board filled with 0
 		for i in range(self.height):
 			self.board.append([])
 			for j in range(self.width):
 				self.board[i].append(0)
 
+		# Generate bomb coordinates
 		self.bombCoordinates = []
 		for i in range(self.bombs):
 			self.cords = [randint(0, self.height-1), randint(0, self.width-1)]
@@ -18,6 +20,7 @@ class Data:
 				self.cords = [randint(0, self.height-1), randint(0, self.width-1)]
 			self.bombCoordinates.append(self.cords)
 
+		# Place 1 in place of 0 in self.board using self.bombCoordinates
 		for i in self.bombCoordinates:
 			self.board[i[0]][i[1]] = 1
 
