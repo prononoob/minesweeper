@@ -6,4 +6,4 @@ Todo:
 - [ ] {Game logic}
 - [ ] Display Board
 
-#To be expanded
+# To be expanded
