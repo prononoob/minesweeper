@@ -2,7 +2,7 @@
 Graphical minesweeper game
 ---
 Todo:
-- [ ] Generate a board
+- [x] Generate a board
 - [ ] {Game logic}
 - [ ] Display Board
 
