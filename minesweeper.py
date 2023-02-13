@@ -1,4 +1,6 @@
 from random import randint
+from tkinter import *
+from tkinter import ttk
 
 
 class Data:
@@ -25,6 +27,21 @@ class Data:
 			self.board[i[0]][i[1]] = 1
 
 
+class Window:
+	def __init__(self, board, m, n):
+		self.board = board
+		self.m, self.n = m, n
+		self.root = Tk()
+		self.root.geometry('700x700')
+		self.frm = ttk.Frame(self.root, padding=10)
+		self.createButtons(self.m, self.n)
+		self.root.mainloop()
+
+
+	def createButtons(self, height, width):
+		for i in range(width):
+			for j in range(height):
+				Button(self.root, text='B', height = 1, width = 1).grid(column=i, row=j)
 
 
 if __name__ == '__main__':
@@ -32,3 +49,4 @@ if __name__ == '__main__':
 	for i in data.board:
 		print(i)
 	print(data.bombCoordinates)
+	window = Window(data.board, 5, 10)
