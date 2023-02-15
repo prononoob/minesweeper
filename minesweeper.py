@@ -29,6 +29,59 @@ class Data:
 		for i in self.board:
 			print(i)
 
+		self.boardWithBombCounter = [[x for x in range(self.width)][:] for y in range(self.height)]
+		for i in range(len(self.boardWithBombCounter)):
+			for j in range(len(self.boardWithBombCounter[0])):
+				self.boardWithBombCounter[i][j] = self.checkHowManyBombsAround(i, j)
+
+		print()
+
+		for i in self.boardWithBombCounter:
+			print(i)
+
+	def checkHowManyBombsAround(self, x, y):
+		self.x, self.y = x, y
+		self.UpRight, self.UpLeft, self.DownRight, self.DownLeft = 0, 0, 0, 0
+		self.directions = [self.UpRight, self.UpLeft, self.DownRight, self.DownLeft]
+		self.counter = 0
+		if self.board[self.x][self.y] == 0:
+			if self.x < len(self.board)-1:
+				if self.board[self.x+1][self.y] == 1:
+					self.counter += 1
+				self.DownLeft += 1
+				self.DownRight += 1
+			if self.x > 0:
+				if self.board[self.x-1][self.y] == 1:
+					self.counter += 1
+				self.UpLeft += 1
+				self.UpRight += 1
+			if self.y < len(self.board[0])-1:
+				if self.board[self.x][self.y+1] == 1:
+					self.counter += 1
+				self.UpRight += 1
+				self.DownRight += 1
+			if self.y > 0:
+				if self.board[self.x][self.y-1] == 1:
+					self.counter += 1
+				self.UpLeft += 1
+				self.DownLeft += 1
+			if self.UpRight == 2:
+				if self.board[self.x-1][self.y+1] == 1:
+					self.counter += 1
+			if self.DownRight == 2:
+				if self.board[self.x+1][self.y+1] == 1:
+					self.counter += 1
+			if self.UpLeft == 2:
+				if self.board[self.x-1][self.y-1] == 1:
+					self.counter += 1
+			if self.DownLeft == 2:
+				if self.board[self.x+1][self.y-1] == 1:
+					self.counter += 1
+		else:
+			self.counter = 9
+		return self.counter
+
+
 
 class ButtonProperties:
 	def __init__(self, sRoot, x, y):
@@ -78,7 +131,7 @@ class Window:
 		self.data = Data(self.height, self.width, self.bombs)
 		for i in range(self.width):
 			for j in range(self.height):
-				globals()['buttonprops%s%s' %(i, j)] = ButtonProperties(self, i, j)
+				ButtonProperties(self, i, j)
 
 
 if __name__ == '__main__':
