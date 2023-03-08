@@ -84,12 +84,22 @@ class Data:
 
 
 class ButtonProperties:
+	
+	# DISABLE BUTTON:
+	# 	button['state'] = DISABLED
+	#	may need a name!!
+
 	def __init__(self, sRoot, x, y):
 		self.x, self.y, self.sRoot = x, y, sRoot
-		Button(self.sRoot.root, text=str('%sx%s'%(self.y, self.x)), height = 1, width = 1, command=self.getVal).grid(column=self.x, row=self.y)
+		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.getVal)
+		self.button.grid(column=self.x, row=self.y)
 
 	def getVal(self):
 		print(self.y, 'x', self.x, '=', self.sRoot.data.board[self.y][self.x])
+		self.button['text'] = self.isBomb()
+
+	def isBomb(self) -> str:
+		return str(self.sRoot.data.board[self.y][self.x])
 
 class Window:
 	def __init__(self):
@@ -128,10 +138,18 @@ class Window:
 			self.root.geometry('1055x450')
 			self.destroySelfMenuButtons()
 
+		# Create buttons on the grid
 		self.data = Data(self.height, self.width, self.bombs)
 		for i in range(self.width):
 			for j in range(self.height):
-				ButtonProperties(self, i, j)
+				globals()['field%sx%s'%(i, j)] = ButtonProperties(self, i, j)
+
+		#	CHANGING PROPERTIES OF A BUTTON
+		'''for i in range(self.width):
+			for j in range(self.height):
+				if (i+j)%2 == 0:
+					globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('nuttin')
+					globals()['field%sx%s'%(i, j)].button['text'] = '0' '''
 
 
 if __name__ == '__main__':
