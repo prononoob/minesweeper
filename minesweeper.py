@@ -39,7 +39,7 @@ class Data:
 		for i in self.boardWithBombCounter:
 			print(i)
 
-	def checkHowManyBombsAround(self, x, y):
+	def checkHowManyBombsAround(self, x, y) -> int:
 		self.x, self.y = x, y
 		self.UpRight, self.UpLeft, self.DownRight, self.DownLeft = 0, 0, 0, 0
 		self.directions = [self.UpRight, self.UpLeft, self.DownRight, self.DownLeft]
@@ -91,7 +91,7 @@ class ButtonProperties:
 
 	def __init__(self, sRoot, x, y):
 		self.x, self.y, self.sRoot = x, y, sRoot
-		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.getVal)
+		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.bombAction)
 		self.button.grid(column=self.x, row=self.y)
 
 	def getVal(self):
@@ -100,6 +100,18 @@ class ButtonProperties:
 
 	def isBomb(self) -> str:
 		return str(self.sRoot.data.board[self.y][self.x])
+
+	def bombAction(self):
+		# IF CLICKED ON A BOMB
+		if int(self.isBomb()):
+			print('-    GAME OVER    -')
+			for i in range(self.sRoot.width):
+				for j in range(self.sRoot.height):
+					globals()['field%sx%s'%(i, j)].button['text'] = globals()['field%sx%s'%(i, j)].isBomb()
+					globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+		# IF CLICKED ON AN EMPTY FIELD
+		else:
+			print('empty!')
 
 class Window:
 	def __init__(self):
