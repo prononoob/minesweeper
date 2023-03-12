@@ -114,7 +114,7 @@ class ButtonProperties:
 
 	def __init__(self, sRoot, x, y):
 		self.x, self.y, self.sRoot = x, y, sRoot
-		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.fieldAction)
+		self.button = Button(self.sRoot.mineField, height = 1, width = 1, command=self.fieldAction)
 		self.button.grid(column=self.x, row=self.y)
 
 	def getVals(self) -> list:
@@ -124,22 +124,47 @@ class ButtonProperties:
 		return str(self.sRoot.data.board[self.y][self.x])
 
 	def fieldAction(self):
+
 		# IF CLICKED ON A BOMB
 		if int(self.isBomb()):
-			if self.sRoot.firstClick:
+			if self.sRoot.firstClick and not self.sRoot.isFlag.get():
 				self.sRoot.firstClick = False
 				self.sRoot.data.transformBoard(self.getVals())
 			else:
-				print('-    GAME OVER    -')
-				for i in range(self.sRoot.width):
-					for j in range(self.sRoot.height):
-						globals()['field%sx%s'%(i, j)].button['text'] = globals()['field%sx%s'%(i, j)].isBomb()
-						globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+				if globals()['field%sx%s'%(self.x, self.y)].button['bg'] == '#c9c9c9':
+					print('flagged, cant reveal')
+				if self.sRoot.isFlag.get():
+					self.changeFlag()
+				elif globals()['field%sx%s'%(self.x, self.y)].button['bg'] != '#c9c9c9':
+					if not self.sRoot.isFlag.get():
+						print('-    GAME OVER    -')
+						for i in range(self.sRoot.width):
+							for j in range(self.sRoot.height):
+								if int(globals()['field%sx%s'%(i, j)].isBomb()):
+									globals()['field%sx%s'%(i, j)].button['text'] = 'X'
+								else:
+									globals()['field%sx%s'%(i, j)].button['bg'] = '#a9a9a9'
+								globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+			
 		# IF CLICKED ON AN EMPTY FIELD
 		else:
-			if self.sRoot.firstClick:
+			if self.sRoot.firstClick and not self.sRoot.isFlag.get():
 				self.sRoot.firstClick = False
+			if self.sRoot.isFlag.get():
+				self.changeFlag()
+			else:
+				if globals()['field%sx%s'%(self.x, self.y)].button['bg'] != '#c9c9c9':
+					globals()['field%sx%s'%(self.x, self.y)].button['bg'] = '#a9a9a9'
+					globals()['field%sx%s'%(self.x, self.y)].button['state'] = DISABLED
 			print('empty!')
+
+	def changeFlag(self):
+		if globals()['field%sx%s'%(self.x, self.y)].button['bg'] != '#c9c9c9':
+			globals()['field%sx%s'%(self.x, self.y)].button['bg'] = '#c9c9c9'
+			globals()['field%sx%s'%(self.x, self.y)].button['text'] = '?'
+		else:
+			globals()['field%sx%s'%(self.x, self.y)].button['bg'] = '#d9d9d9'
+			globals()['field%sx%s'%(self.x, self.y)].button['text'] = ''
 
 class Window:
 	def __init__(self):
@@ -164,19 +189,33 @@ class Window:
 		self.hard.destroy()
 
 
+	def createFrames(self, height, width):
+		self.mineField = Frame(self.root, height=height, width=width)
+		self.mineField.grid(column=0, row=0)
+		self.switchFrame = Frame(self.root, height=40, width=width)
+		self.switchFrame.grid(column=0, row=1)
+		self.isFlag = BooleanVar(value=False)
+		Radiobutton(self.switchFrame, text='Reveal', variable=self.isFlag, value=False).pack()
+		Radiobutton(self.switchFrame, text='Flag', variable=self.isFlag, value=True).pack()
+
+
+
 	def createButtons(self, height, width, bombs):
 		self.height, self.width, self.bombs = height, width, bombs
 
 		# Set screen size fitting to the difficulty
 		if self.height == 8 and self.width == 8 and self.bombs == 10:
-			self.root.geometry('280x225')
+			self.root.geometry('280x265')
 			self.destroySelfMenuButtons()
+			self.createFrames(225, 280)
 		elif self.height == 16 and self.width == 16 and self.bombs == 40:
-			self.root.geometry('565x450')
+			self.root.geometry('565x490')
 			self.destroySelfMenuButtons()
+			self.createFrames(450, 565)
 		elif self.height == 16 and self.width == 30 and self.bombs == 99:
-			self.root.geometry('1055x450')
+			self.root.geometry('1055x490')
 			self.destroySelfMenuButtons()
+			self.createFrames(450, 1055)
 
 		# Create buttons on the grid
 		self.data = Data(self.height, self.width, self.bombs)
