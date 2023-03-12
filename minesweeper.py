@@ -18,7 +18,7 @@ class Data:
 		self.bombCoordinates = []
 		for i in range(self.bombs):
 			self.cords = [randint(0, self.height-1), randint(0, self.width-1)]
-			while self.cords in self.bombCoordinates:
+			while self.cords in self.bombCoordinates or self.cords == [0, 0]:
 				self.cords = [randint(0, self.height-1), randint(0, self.width-1)]
 			self.bombCoordinates.append(self.cords)
 
@@ -29,15 +29,38 @@ class Data:
 		for i in self.board:
 			print(i)
 
+	# THIS HAS TO BE DONE AFTER TRANSFORMATION
+	# Generate a board with fields saying
+	# how many bombs are around
+	def generateBoardWithBombCounter(self):
 		self.boardWithBombCounter = [[x for x in range(self.width)][:] for y in range(self.height)]
 		for i in range(len(self.boardWithBombCounter)):
 			for j in range(len(self.boardWithBombCounter[0])):
 				self.boardWithBombCounter[i][j] = self.checkHowManyBombsAround(i, j)
-
+		
 		print()
-
 		for i in self.boardWithBombCounter:
 			print(i)
+
+	# If first click was on a bomb
+	# this method transform the board
+	# so that the click was on an empty field
+	def transformBoard(self, clickVals: list):
+		print(clickVals)
+		self.copyBoard = [i[:] for i in self.board]
+		self.clickVals = clickVals
+		for y in range(len(self.board)):
+			for x in range(len(self.board[0])):
+				self.newXY = self.makeCords(x, y)
+				self.board[y][x] = self.copyBoard[self.newXY[1]][self.newXY[0]]
+		del self.clickVals, self.copyBoard
+		for i in self.board:
+			print(i)
+
+	def makeCords(self, oldX, oldY) -> list:
+		self.newX = oldX-self.clickVals[0]
+		self.newY = oldY-self.clickVals[1]
+		return [self.newX, self.newY]
 
 	def checkHowManyBombsAround(self, x, y) -> int:
 		self.x, self.y = x, y
@@ -91,26 +114,31 @@ class ButtonProperties:
 
 	def __init__(self, sRoot, x, y):
 		self.x, self.y, self.sRoot = x, y, sRoot
-		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.bombAction)
+		self.button = Button(self.sRoot.root, height = 1, width = 1, command=self.fieldAction)
 		self.button.grid(column=self.x, row=self.y)
 
-	def getVal(self):
-		print(self.y, 'x', self.x, '=', self.sRoot.data.board[self.y][self.x])
-		self.button['text'] = self.isBomb()
+	def getVals(self) -> list:
+		return[self.x, self.y]
 
 	def isBomb(self) -> str:
 		return str(self.sRoot.data.board[self.y][self.x])
 
-	def bombAction(self):
+	def fieldAction(self):
 		# IF CLICKED ON A BOMB
 		if int(self.isBomb()):
-			print('-    GAME OVER    -')
-			for i in range(self.sRoot.width):
-				for j in range(self.sRoot.height):
-					globals()['field%sx%s'%(i, j)].button['text'] = globals()['field%sx%s'%(i, j)].isBomb()
-					globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+			if self.sRoot.firstClick:
+				self.sRoot.firstClick = False
+				self.sRoot.data.transformBoard(self.getVals())
+			else:
+				print('-    GAME OVER    -')
+				for i in range(self.sRoot.width):
+					for j in range(self.sRoot.height):
+						globals()['field%sx%s'%(i, j)].button['text'] = globals()['field%sx%s'%(i, j)].isBomb()
+						globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
 		# IF CLICKED ON AN EMPTY FIELD
 		else:
+			if self.sRoot.firstClick:
+				self.sRoot.firstClick = False
 			print('empty!')
 
 class Window:
@@ -155,6 +183,7 @@ class Window:
 		for i in range(self.width):
 			for j in range(self.height):
 				globals()['field%sx%s'%(i, j)] = ButtonProperties(self, i, j)
+		self.firstClick = True
 
 		#	CHANGING PROPERTIES OF A BUTTON
 		'''for i in range(self.width):
