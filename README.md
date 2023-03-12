@@ -4,6 +4,6 @@ Graphical minesweeper game
 Todo:
 - [x] Generate a board
 - [ ] {Game logic}
-- [ ] Display Board
+- [x] Display Board
 
 # To be expanded
