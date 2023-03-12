@@ -138,13 +138,8 @@ class ButtonProperties:
 				elif globals()['field%sx%s'%(self.x, self.y)].button['bg'] != '#c9c9c9':
 					if not self.sRoot.isFlag.get():
 						print('-    GAME OVER    -')
-						for i in range(self.sRoot.width):
-							for j in range(self.sRoot.height):
-								if int(globals()['field%sx%s'%(i, j)].isBomb()):
-									globals()['field%sx%s'%(i, j)].button['text'] = 'X'
-								else:
-									globals()['field%sx%s'%(i, j)].button['bg'] = '#a9a9a9'
-								globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+						self.boardReveal()
+						
 			
 		# IF CLICKED ON AN EMPTY FIELD
 		else:
@@ -165,6 +160,17 @@ class ButtonProperties:
 		else:
 			globals()['field%sx%s'%(self.x, self.y)].button['bg'] = '#d9d9d9'
 			globals()['field%sx%s'%(self.x, self.y)].button['text'] = ''
+
+	def boardReveal(self):
+		for i in range(self.sRoot.width):
+			for j in range(self.sRoot.height):
+				if int(globals()['field%sx%s'%(i, j)].isBomb()):
+					globals()['field%sx%s'%(i, j)].button['text'] = 'X'
+				else:
+					globals()['field%sx%s'%(i, j)].button['bg'] = '#a9a9a9'
+					globals()['field%sx%s'%(i, j)].button['state'] = DISABLED
+				globals()['field%sx%s'%(i, j)].button['command'] = lambda: print('Game ended')
+
 
 class Window:
 	def __init__(self):
