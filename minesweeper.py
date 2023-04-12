@@ -131,7 +131,8 @@ class ButtonProperties:
 				self.sRoot.firstClick = False
 				self.sRoot.data.transformBoard(self.getVals())
 			else:
-				if globals()['field%sx%s'%(self.x, self.y)].button['bg'] == '#c9c9c9':
+				if (globals()['field%sx%s'%(self.x, self.y)].button['bg'] == '#c9c9c9'
+					and not globals()['field%sx%s'%(self.x, self.y)].isBomb()):
 					print('flagged, cant reveal')
 				if self.sRoot.isFlag.get():
 					self.changeFlag()
